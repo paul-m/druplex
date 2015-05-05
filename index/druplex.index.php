@@ -22,13 +22,15 @@ require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 
 // Make a Druplex app object.
-$app = new DruplexApplication(DRUPAL_ROOT);
+$app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
+
+// If we match a route from Druplex, use Druplex.
 $request = Request::createFromGlobals();
 $resolver = $app['resolver'];
-// If we match a route from Druplex, use Druplex.
 if ($resolver->getController($request) != FALSE) {
   $app->run($request);
 }
+
 // Otherwise, use Drupal.
 else {
   unset($app);

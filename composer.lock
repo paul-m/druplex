@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ea2477c2a31f114fae2eb0e04be450ae",
+    "hash": "7da5e3fc423715f865a230a7a5a171a2",
     "packages": [
         {
             "name": "deralex/yaml-config-service-provider",

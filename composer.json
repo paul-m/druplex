@@ -1,4 +1,13 @@
 {
+  "name": "mile23/druplex",
+  "description": "Graft a Silex onto Drupal 7",
+  "license": "GPL 2.0+",
+  "authors": [
+    {
+      "name": "Paul Mitchum",
+      "email": "paul@mile23.com"
+    }
+  ],
   "require": {
     "silex/silex": "^1.2",
     "deralex/yaml-config-service-provider": "^1.0"

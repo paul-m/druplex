@@ -15,12 +15,8 @@ use Silex\Provider\SecurityServiceProvider;
 
 class DruplexApplication extends Application {
 
-  public function __construct(
-    $drupal_root
-    ) {
-    parent::__construct();
-
-    $this['drupal_root'] = $drupal_root;
+  public function __construct($values) {
+    parent::__construct($values);
     /**
      * Environment.
      *
@@ -90,9 +86,7 @@ class DruplexApplication extends Application {
       array('^.*$', 'ROLE_USER'),
     );
 
-    /**
-     * Routing.
-     */
+    // Routing.
     $this['routes'] = $this->extend('routes', function (RouteCollection $routes, Application $this) {
       $loader = new YamlFileLoader(new FileLocator(__DIR__));
       $collection = $loader->load('routes.yml');
