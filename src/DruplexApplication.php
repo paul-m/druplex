@@ -9,43 +9,17 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use DerAlex\Silex\YamlConfigServiceProvider;
 use Silex\Application;
-use Silex\Provider\SecurityServiceProvider;
+use Silex\Provider\DoctrineServiceProvider;
 
 class DruplexApplication extends Application {
 
   public function __construct($values) {
     parent::__construct($values);
-    /**
-     * Environment.
-     *
-     * If we can pull the config from our known location, do so. Otherwise grab the
-     * test config.
-     */
-    if (file_exists('/etc/drupalci/config.yaml')) {
-      $config = '/etc/drupalci/config.yaml';
-    }
-    else {
-      $config = __DIR__ . '/../config/config-test.yaml';
-    }
 
-    /**
-     * Services.
-     */
-    $this->register(new YamlConfigServiceProvider($config));
+    $this['debug'] = TRUE;
 
-    /**
-     * Handling.
-     */
-    $this->error(function (\Exception $e, $code) use ($this) {
-      if ($e instanceof HttpException) {
-        return new Response($e->getMessage(), $e->getStatusCode());
-      }
-      return "Something went wrong. Please contact the DrupalCI team.";
-    });
-
-// Set up JSON as a middleware.
+    // Set up JSON as a middleware.
     $this->before(function (Request $request, Application $this) {
       if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
         $data = json_decode($request->getContent(), true);
@@ -53,7 +27,7 @@ class DruplexApplication extends Application {
       }
     });
 
-// Make sure we wrap JSONP in a callback if present.
+    // Make sure we wrap JSONP in a callback if present.
     $this->after(function (Request $request, Response $response) {
       if ($response instanceof JsonResponse) {
         $callback = $request->get('callback', '');
@@ -63,35 +37,27 @@ class DruplexApplication extends Application {
       }
     });
 
-// Security definition.
-    $encoder = new MessageDigestPasswordEncoder();
-    $users = array();
-    foreach ($this['config']['users'] as $username => $password) {
-      $users[$username] = array(
-        'ROLE_USER',
-        $encoder->encodePassword($password, ''),
-      );
-    }
-    $this->register(new SecurityServiceProvider());
-    $this['security.firewalls'] = array(
-      // Login URL is open to everybody.
-      'default' => array(
-        'pattern' => '^.*$',
-        'http' => true,
-        'stateless' => true,
-        'users' => $users,
-      ),
+    // Set up the database from Drupal's settings.
+    global $databases;
+    $database = $databases['default']['default'];
+    $driver_map = array(
+      'mysql' => 'pdo_mysql',
     );
-    $this['security.access_rules'] = array(
-      array('^.*$', 'ROLE_USER'),
-    );
+    $this->register(new DoctrineServiceProvider(), array(
+        'db.options' => array(
+            'driver'   => $driver_map[$database['driver']],
+            'host'      => $database['host'],
+            'dbname'    => $database['database'],
+            'user'      => $database['username'],
+            'password'  => $database['password'],
+            'port'     => $database['port'],
+            'charset'   => 'utf8',
+        ),
+    ));
 
-    // Routing.
-    $this['routes'] = $this->extend('routes', function (RouteCollection $routes, Application $this) {
-      $loader = new YamlFileLoader(new FileLocator(__DIR__));
-      $collection = $loader->load('routes.yml');
-      $routes->addCollection($collection);
-      return $routes;
+    $this->get('/api', function (DruplexApplication $app) {
+      $connection = $app['db'];
+      return new Response("I'm the api!");
     });
   }
 

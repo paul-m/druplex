@@ -17,23 +17,20 @@ define('DRUPAL_ROOT', getcwd());
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Druplex needs the database.
+// Druplex needs the Drupal.
 require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
-
-// Make a Druplex app object.
-$app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
 // If we match a route from Druplex, use Druplex.
 $request = Request::createFromGlobals();
-$resolver = $app['resolver'];
-if ($resolver->getController($request) != FALSE) {
+$path_array = explode('/', $request->getPathInfo());
+if (isset($path_array[1]) && $path_array[1] == 'api') {
+  // Make a Druplex app object.
+  $app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
   $app->run($request);
 }
-
 // Otherwise, use Drupal.
 else {
   unset($app);
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
   menu_execute_active_handler();
 }
