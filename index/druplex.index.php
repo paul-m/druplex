@@ -24,13 +24,14 @@ drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 // Make a Druplex app object.
 $app = new DruplexApplication(DRUPAL_ROOT);
 $request = Request::createFromGlobals();
-$router = $app['router'];
+$resolver = $app['resolver'];
 // If we match a route from Druplex, use Druplex.
-if ($router->matchRequest($request)) {
+if ($resolver->getController($request) != FALSE) {
   $app->run($request);
 }
 // Otherwise, use Drupal.
 else {
+  unset($app);
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
   menu_execute_active_handler();
 }
