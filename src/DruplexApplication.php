@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Silex\Application;
+use Druplex\Controller\UserController;
 
 /**
  * The Druplex application class.
@@ -48,18 +49,19 @@ class DruplexApplication extends Application {
       }
     });
 
+    $controller = new UserController;
     $this->get(
       $this['api_prefix'] . '/user/{uid}',
-      array('\Druplex\Controller\UserController', 'getUser')
+      array($controller, 'getUser')
     );
     // Field query. ?fieldname=field_something&fieldvalue=foo
     $this->get(
       $this['api_prefix'] . '/user/field/{fieldname}/{column}/{value}',
-      array('\Druplex\Controller\UserController', 'getUserByField')
+      array($controller, 'getUserByField')
     );
     $this->get(
       $this['api_prefix'] . '/user/uli/{uid}',
-      array('\Druplex\Controller\UserController', 'getUserUli')
+      array($controller, 'getUserUli')
     );
   }
 
