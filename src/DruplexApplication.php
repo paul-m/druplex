@@ -54,7 +54,7 @@ class DruplexApplication extends Application {
       $this['api_prefix'] . '/user/{uid}',
       array($controller, 'getUser')
     );
-    $this->get(
+    $this->put(
       $this['api_prefix'] . '/user/{uid}',
       array($controller, 'putUser')
     );
