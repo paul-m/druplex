@@ -52,10 +52,13 @@ class DruplexApplication extends Application {
       $this['api_prefix'] . '/user/{uid}',
       array('\Druplex\Controller\UserController', 'getUser')
     );
-    // Field query. ?fieldname=field_something&fieldvalue=foo
     $this->get(
       $this['api_prefix'] . '/user/field/{fieldname}/{column}/{value}',
       array('\Druplex\Controller\UserController', 'getUserByField')
+    );
+    $this->put(
+      $this['api_prefix'] . '/user/field/{uid}',
+      array('\Druplex\Controller\UserController', 'putUserField')
     );
     $this->get(
       $this['api_prefix'] . '/user/uli/{uid}',

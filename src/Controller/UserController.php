@@ -35,6 +35,41 @@ class UserController {
     $app->abort(400);
   }
 
+  public function putUserField(DruplexApplication $app, $uid, $fieldname, $column, $value) {
+    // See if the field exists.
+
+    $instances = \field_info_instances('user', 'user');
+    error_log(print_r($instances, TRUE));
+
+    $field_map = \field_info_field_map();
+    if (isset($field_map[$fieldname])) {
+      if (isset($field_map[$fieldname]['bundles']['user'])) {
+        unset($field_map);
+
+$user = \user_load($uid);
+$user->field_myfield[LANGUAGE_NONE][0]['value']= 5;
+$edit = array($fieldname
+);
+\user_save($user);
+
+
+      }
+    }
+
+
+
+    $query = new \EntityFieldQuery();
+    $query->entityCondition('entity_type', 'user')
+      ->fieldCondition($fieldname, $column, $value, '=');
+    $result = $query->execute();
+    if (isset($result['user'])) {
+      $user = \user_load(reset($result['user'])->uid);
+      $user = self::sanitize($user);
+      return $app->json($user);
+    }
+    $app->abort(400);
+  }
+
   public function getUserUli(DruplexApplication $app, $uid) {
     if (FALSE === $user = \user_load($uid)) {
       $app->abort(404);
