@@ -10,12 +10,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Silex\Application;
-use Silex\Provider\DoctrineServiceProvider;
 
+/**
+ * The Druplex application class.
+ *
+ * This class assumes that Drupal 7 has been bootstrapped but not set to handle
+ * a request yet. It uses the $druplex global variable in settings.php for
+ * configuration.
+ */
 class DruplexApplication extends Application {
 
   public function __construct($values) {
     parent::__construct($values);
+
+    global $druplex;
+    $this['debug'] = isset($druplex['debug']) ? $druplex['debug'] : FALSE;
+    $this['api_prefix'] = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : 'api';
+
 
     $this['debug'] = TRUE;
 
@@ -37,28 +48,19 @@ class DruplexApplication extends Application {
       }
     });
 
-    // Set up the database from Drupal's settings.
-    global $databases;
-    $database = $databases['default']['default'];
-    $driver_map = array(
-      'mysql' => 'pdo_mysql',
+    $this->get(
+      $this['api_prefix'] . '/user/{uid}',
+      array('\Druplex\Controller\UserController', 'getUser')
     );
-    $this->register(new DoctrineServiceProvider(), array(
-        'db.options' => array(
-            'driver'   => $driver_map[$database['driver']],
-            'host'      => $database['host'],
-            'dbname'    => $database['database'],
-            'user'      => $database['username'],
-            'password'  => $database['password'],
-            'port'     => $database['port'],
-            'charset'   => 'utf8',
-        ),
-    ));
-
-    $this->get('/api', function (DruplexApplication $app) {
-      $connection = $app['db'];
-      return new Response("I'm the api!");
-    });
+    // Field query. ?fieldname=field_something&fieldvalue=foo
+    $this->get(
+      $this['api_prefix'] . '/user/field/{fieldname}/{column}/{value}',
+      array('\Druplex\Controller\UserController', 'getUserByField')
+    );
+    $this->get(
+      $this['api_prefix'] . '/user/uli/{uid}',
+      array('\Druplex\Controller\UserController', 'getUserUli')
+    );
   }
 
 }

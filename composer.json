@@ -9,9 +9,7 @@
     }
   ],
   "require": {
-    "silex/silex": "^1.2",
-    "deralex/yaml-config-service-provider": "^1.0",
-    "doctrine/dbal": "^2.5"
+    "silex/silex": "^1.2"
   },
   "autoload": {
     "psr-4": {
