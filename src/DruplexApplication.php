@@ -2,14 +2,11 @@
 
 namespace Druplex;
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Silex\Application;
+use Silex\Provider\SecurityServiceProvider;
 use Druplex\Controller\UserController;
 
 /**
@@ -26,8 +23,7 @@ class DruplexApplication extends Application {
 
     global $druplex;
     $this['debug'] = isset($druplex['debug']) ? $druplex['debug'] : FALSE;
-    $this['api_prefix'] = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : 'api';
-
+    $this['api_prefix'] = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : '/api';
 
     $this['debug'] = TRUE;
 
@@ -51,25 +47,23 @@ class DruplexApplication extends Application {
 
     // Security definition.
     $encoder = new MessageDigestPasswordEncoder();
-    $users = array();
-    foreach ($app['config']['users'] as $username => $password) {
-      $users[$username] = array(
-        'ROLE_USER',
-        $encoder->encodePassword($password, ''),
-      );
-    }
-    $app->register(new SecurityServiceProvider());
-    $app['security.firewalls'] = array(
+    $users['paul'] = array(
+      'ROLE_USER',
+      $encoder->encodePassword('password', ''),
+    );
+    $pattern = '^' . $this['api_prefix'];
+    $this->register(new SecurityServiceProvider());
+    $this['security.firewalls'] = array(
         // Login URL is open to everybody.
         'default' => array(
-            'pattern' => '^.*$',
+            'pattern' => $pattern,
             'http' => true,
             'stateless' => true,
             'users' => $users,
         ),
     );
-    $app['security.access_rules'] = array(
-        array('^.*$', 'ROLE_USER'),
+    $this['security.access_rules'] = array(
+        array($pattern, 'ROLE_USER'),
     );
 
     $controller = new UserController;
