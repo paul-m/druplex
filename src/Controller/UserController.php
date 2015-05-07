@@ -41,16 +41,20 @@ class UserController {
 
   public function getUserByField(DruplexApplication $app, $fieldname, $column, $value) {
     $query = new \EntityFieldQuery();
-    $query->entityCondition('entity_type', 'user')
-      ->fieldCondition($fieldname, $column, $value, '=');
-    $result = $query->execute();
-    error_log(print_r($result, TRUE));
+    try {
+      $query->entityCondition('entity_type', 'user')
+        ->fieldCondition($fieldname, $column, $value, '=');
+      $result = $query->execute();
+    }
+    catch (\Exception $e) {
+      $app->abort(404, $e->getMessage());
+    }
     if (isset($result['user'])) {
       $user = \user_load(reset($result['user'])->uid);
       $user = self::sanitize($user);
       return $app->json($user);
     }
-    $app->abort(400);
+    $app->abort(404);
   }
 
   public function getUserUli(DruplexApplication $app, $uid) {

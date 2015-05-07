@@ -41,6 +41,7 @@ class User {
         }
       }
     }
+    return $this;
   }
 
   public function setAttachedField($field_name, $field_column, $field_value) {
@@ -64,6 +65,7 @@ class User {
         }
       }
     }
+    return $this;
   }
 
 }

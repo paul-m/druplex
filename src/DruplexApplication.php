@@ -45,16 +45,19 @@ class DruplexApplication extends Application {
       }
     });
 
+    // Glean an API user from settings.
+    // @todo: Hook this into the Drupal user set.
+    $user = isset($druplex['api_user']) ? $druplex['api_user'] : 'paul';
+    $password = isset($druplex['api_password']) ? $druplex['api_password'] : 'password';
     // Security definition.
     $encoder = new MessageDigestPasswordEncoder();
-    $users['paul'] = array(
+    $users[$user] = array(
       'ROLE_USER',
-      $encoder->encodePassword('password', ''),
+      $encoder->encodePassword($password, ''),
     );
     $pattern = '^' . $this['api_prefix'];
     $this->register(new SecurityServiceProvider());
     $this['security.firewalls'] = array(
-        // Login URL is open to everybody.
         'default' => array(
             'pattern' => $pattern,
             'http' => true,
