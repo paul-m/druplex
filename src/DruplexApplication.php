@@ -2,12 +2,13 @@
 
 namespace Druplex;
 
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Druplex\Controller\UserController;
 use Silex\Application;
 use Silex\Provider\SecurityServiceProvider;
-use Druplex\Controller\UserController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 /**
  * The Druplex application class.
