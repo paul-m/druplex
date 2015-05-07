@@ -9,7 +9,8 @@
     }
   ],
   "require": {
-    "silex/silex": "^1.2"
+    "silex/silex": "^1.2",
+    "symfony/security": "^2.6"
   },
   "autoload": {
     "psr-4": {

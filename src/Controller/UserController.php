@@ -5,6 +5,7 @@ namespace Druplex\Controller;
 use Druplex\DruplexApplication;
 use Druplex\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController {
 
@@ -25,8 +26,7 @@ class UserController {
     }
     if (count($needed) > 0) {
       $app->abort(
-        400,
-        'These fields are required: ' . implode(', ', $needed)
+        400, 'These fields are required: ' . implode(', ', $needed)
       );
     }
   }
@@ -44,6 +44,7 @@ class UserController {
     $query->entityCondition('entity_type', 'user')
       ->fieldCondition($fieldname, $column, $value, '=');
     $result = $query->execute();
+    error_log(print_r($result, TRUE));
     if (isset($result['user'])) {
       $user = \user_load(reset($result['user'])->uid);
       $user = self::sanitize($user);
@@ -57,8 +58,8 @@ class UserController {
       $app->abort(404);
     }
     return $app->json(array(
-      'user' => self::sanitize($user),
-      'uli' => user_pass_reset_url($user)
+        'user' => self::sanitize($user),
+        'uli' => \user_pass_reset_url($user)
     ));
   }
 
@@ -72,9 +73,7 @@ class UserController {
       if ($field_name = $request->get('fieldname', FALSE)) {
         $this->abortForRequiredFields($app, $request, array('fieldcolumn', 'fieldvalue'));
         $user_setter->setAttachedField(
-          $field_name,
-          $request->get('fieldcolumn'),
-          $request->get('fieldvalue')
+          $field_name, $request->get('fieldcolumn'), $request->get('fieldvalue')
         );
       }
       if ($user_setter->changed()) {
@@ -83,6 +82,44 @@ class UserController {
       return $app->json(UserController::sanitize(\user_load($uid)));
     }
     $app->abort(400);
+  }
+
+  public function postUser(DruplexApplication $app) {
+    // Check if a user with this email exists.
+    $request = $app['request'];
+    $this->abortForRequiredFields($app, $request, array('name', 'mail'));
+    if ($request->get('pass', FALSE)) {
+      $app->abort(400, 'Do not include a password for the user. One will be generated.');
+    }
+    $query = new \EntityFieldQuery();
+    $query->entityCondition('entity_type', 'user')
+      ->propertyCondition('mail', $request->get('mail'), '=');
+    $result = $query->execute();
+    $user = NULL;
+    if (isset($result['user'])) {
+      $user = \user_load(reset($result['user'])->uid);
+    }
+    if ($user) {
+      $app->abort(409, 'A user with that email address already exists.');
+    }
+
+    $user = new \stdClass();
+    $user_setter = new User($user);
+    $user_setter->setFields($request);
+    $user = $user_setter->getUser();
+
+    $user->pass = \user_password(30);
+
+    $user = \user_save($user);
+
+    if ($user) {
+      $response = new JsonResponse(UserController::sanitize($user), 201);
+      // @todo: make this work.
+      $response->headers->add(array('Location' => 'uh'));
+      return $response;
+    }
+
+    $app->abort(500, 'Unable to save new user.');
   }
 
 }

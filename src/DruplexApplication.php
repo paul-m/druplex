@@ -49,7 +49,34 @@ class DruplexApplication extends Application {
       }
     });
 
+    // Security definition.
+    $encoder = new MessageDigestPasswordEncoder();
+    $users = array();
+    foreach ($app['config']['users'] as $username => $password) {
+      $users[$username] = array(
+        'ROLE_USER',
+        $encoder->encodePassword($password, ''),
+      );
+    }
+    $app->register(new SecurityServiceProvider());
+    $app['security.firewalls'] = array(
+        // Login URL is open to everybody.
+        'default' => array(
+            'pattern' => '^.*$',
+            'http' => true,
+            'stateless' => true,
+            'users' => $users,
+        ),
+    );
+    $app['security.access_rules'] = array(
+        array('^.*$', 'ROLE_USER'),
+    );
+
     $controller = new UserController;
+    $this->post(
+      $this['api_prefix'] . '/user',
+      array($controller, 'postUser')
+    );
     $this->get(
       $this['api_prefix'] . '/user/{uid}',
       array($controller, 'getUser')
