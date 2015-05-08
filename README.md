@@ -25,6 +25,8 @@ How?
 
 The `api_user` and `api_password` settings are used in protecting the Silex paths behind http authentication. You can't turn this off in settings.
 
+Note that in order to add Druplex to your Pantheon-hosted site, you'll have to say `composer require mile23/druplex @dev --prefer-dist` since Pantheon (rightly) balks when you try to include git submodules.
+
 What's the API?
 --
 
