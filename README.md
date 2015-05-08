@@ -22,8 +22,10 @@ How?
   * `$druplex['api_prefix']` (Mostly working, not entirely..)
   * `$druplex['api_user']`
   * `$druplex['api_password']`
+6. Point your web browser to `http://example.com/api`. After logging in with the http authentication, you will see a Silex error. Success!
+7. Try `http://example.com/api/user/1` and you'll see a bit of JSON representing user 1. Rock on.
 
-The `api_user` and `api_password` settings are used in protecting the Silex paths behind http authentication. You can't turn this off in settings.
+The `api_user` and `api_password` settings are used in protecting the Silex paths behind http authentication. You can't turn this off in settings. Default values: paul password
 
 Note that in order to add Druplex to your Pantheon-hosted site, you'll have to say `composer require mile23/druplex @dev --prefer-dist` since Pantheon (rightly) balks when you try to include git submodules.
 
