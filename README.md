@@ -10,16 +10,16 @@ Druplex is a half-baked way to attach a Silex RESTful API implementation onto Dr
 
 It acts more as a proof-of-concept and some sloppy code to guide others along the way.
 
-How?
+How To Install?
 --
 
-1. Install Composer.
+1. Install Composer: https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx
 2. Go to the root directory of your Drupal 7 installation.
 3. Type this: `composer require mile23/druplex @dev`
 4. Replace the root-level `index.php` file with the one located in `vendor/mile23/druplex/index/druplex.index.php`. Rename it to `index.php`, of course.
-5. Put some settings in your site's `settings.php` file. They should be in the `$druplex` global variable. If you don't set these, druplex will use defaults, some of which might be dangerous. Settings existing now:
+5. Put some settings in your site's `settings.php` file. They should be in the `$druplex` global variable. If you don't set these, druplex will use defaults, some of which might not be secure. Settings existing now:
   * `$druplex['debug']`
-  * `$druplex['api_prefix']` (Mostly working, not entirely..)
+  * `$druplex['api_prefix']`
   * `$druplex['api_user']`
   * `$druplex['api_password']`
 6. Point your web browser to `http://example.com/api`. After logging in with the http authentication, you will see a Silex error. Success!
@@ -46,4 +46,4 @@ More documentation forthcoming. Ping me if you need to.
 Where are the tests, Mr. Testing Man?
 --
 
-There aren't any. :-)
+Forthcoming...
