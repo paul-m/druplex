@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Druplex\DruplexApplication.
+ */
+
 namespace Druplex;
 
 use Druplex\Controller\UserController;
@@ -19,7 +24,19 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
  */
 class DruplexApplication extends Application {
 
-  public function __construct($values) {
+  /**
+   * Constructor.
+   *
+   * In order to keep the modifications to index.php small and readable, we do
+   * all the initialization for the Druplex app here.
+   *
+   * @param array $values
+   *   Parameter values or objects for the container.
+   *
+   * @global array $druplex
+   *   The global settings for Druplex, based on the Drupal settings.php file.
+   */
+  public function __construct(array $values) {
     parent::__construct($values);
 
     global $druplex;
@@ -31,7 +48,7 @@ class DruplexApplication extends Application {
     // Set up JSON as a middleware.
     $this->before(function (Request $request, Application $this) {
       if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), TRUE);
         $request->request->replace(is_array($data) ? $data : array());
       }
     });
@@ -59,21 +76,21 @@ class DruplexApplication extends Application {
     $pattern = '^' . $this['api_prefix'];
     $this->register(new SecurityServiceProvider());
     $this['security.firewalls'] = array(
-        'default' => array(
-            'pattern' => $pattern,
-            'http' => true,
-            'stateless' => true,
-            'users' => $users,
-        ),
+      'default' => array(
+        'pattern' => $pattern,
+        'http' => TRUE,
+        'stateless' => TRUE,
+        'users' => $users,
+      ),
     );
     $this['security.access_rules'] = array(
-        array($pattern, 'ROLE_USER'),
+      array($pattern, 'ROLE_USER'),
     );
 
     // @todo: Until we can specify this another way without loading any files
     // or requiring routes in settings.php, we'll just define this explicitly
     // with an instantiated controller.
-    $controller = new UserController;
+    $controller = new UserController();
     $this->post(
       $this['api_prefix'] . '/user',
       array($controller, 'postUser')
