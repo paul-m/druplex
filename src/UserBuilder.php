@@ -9,7 +9,7 @@ namespace Druplex;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class User {
+class UserBuilder {
 
   protected $user = NULL;
   protected $changed = FALSE;
@@ -26,6 +26,15 @@ class User {
     return $this->changed;
   }
 
+  /**
+   * Change entity fields present in the schema, based on the request.
+   *
+   * @param Request $request
+   *   A request object from which we can glean the fields to change.
+   *
+   * @return $this
+   *   Return the factory object for a fluent interface.
+   */
   public function setFields(Request $request) {
     // Work on schema fields.
     $schema = \drupal_get_schema('users');
@@ -44,6 +53,22 @@ class User {
     return $this;
   }
 
+  /**
+   * Change field values for fields attached to the user entity.
+   *
+   * Note that we do not address the issue of field delta for multi-value
+   * attachments.
+   *
+   * @param string $field_name
+   *   The field's machine name.
+   * @param string $field_column
+   *   The field's column name to change. For text field, 'value'.
+   * @param string $field_value
+   *   The value to set for the named column in the named field.
+   *
+   * @return $this
+   *   Return the factory object for a fluent interface.
+   */
   public function setAttachedField($field_name, $field_column, $field_value) {
     // Work on attached fields.
     // ?fieldname=field_foo&fieldcolumn=value&fieldvalue=text

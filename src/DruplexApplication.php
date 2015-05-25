@@ -47,7 +47,7 @@ class DruplexApplication extends Application {
     });
 
     // Glean an API user from settings.
-    // @todo: Hook this into the Drupal user set.
+    // @todo: Hook this into Drupal user permissions somehow.
     $user = isset($druplex['api_user']) ? $druplex['api_user'] : 'paul';
     $password = isset($druplex['api_password']) ? $druplex['api_password'] : 'password';
     // Security definition.
@@ -70,6 +70,9 @@ class DruplexApplication extends Application {
         array($pattern, 'ROLE_USER'),
     );
 
+    // @todo: Until we can specify this another way without loading any files
+    // or requiring routes in settings.php, we'll just define this explicitly
+    // with an instantiated controller.
     $controller = new UserController;
     $this->post(
       $this['api_prefix'] . '/user',

@@ -3,7 +3,7 @@
 namespace Druplex\Controller;
 
 use Druplex\DruplexApplication;
-use Druplex\User;
+use Druplex\UserBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -72,7 +72,7 @@ class UserController {
     $user = user_load($uid);
     if ($user) {
       $request = $app['request'];
-      $user_setter = new User($user);
+      $user_setter = new UserBuilder($user);
       $user_setter->setFields($request);
       if ($field_name = $request->get('fieldname', FALSE)) {
         $this->abortForRequiredFields($app, $request, array('fieldcolumn', 'fieldvalue'));
@@ -108,7 +108,7 @@ class UserController {
     }
 
     $user = new \stdClass();
-    $user_setter = new User($user);
+    $user_setter = new UserBuilder($user);
     $user_setter->setFields($request);
     $user = $user_setter->getUser();
 
