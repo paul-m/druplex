@@ -1,0 +1,24 @@
+language: php
+php:
+  - 5.4
+
+mysql:
+  database: druplex
+  username: root
+  encoding: utf8
+
+before_script:
+ - mysql -e 'create database druplex;'
+ - pyrus channel-discover pear.drush.org
+ - pyrus install drush/drush
+ - phpenv rehash
+ - drush make drushmake/fixture.make drupal
+ - cp -r drushmake/fixture drupal/profiles
+ - cd drupal
+ - drush si fixture --db-url=mysql://root:@localhost/druplex --yes
+ - cd ..
+ - composer selfupdate
+ - composer --no-progress install
+
+script:
+  - vendor/bin/phpunit
