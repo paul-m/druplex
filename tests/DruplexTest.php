@@ -35,16 +35,52 @@ class DruplexTest extends DruplexTestBase {
   public function testUserPostRoundTrip() {
     $client = $this->createClient($this->httpAuth());
     $params = [
-      'name' => 'paul',
-      'mail' => 'foo@example.com',
+      'name' => 'round_trip',
+      'mail' => 'round_trip@example.com',
     ];
-    $crawler = $client->request('POST', $this->apiPrefix() . 'user', $params);
+    $client->request('POST', $this->apiPrefix() . 'user', $params);
     $this->assertEquals(201, $client->getResponse()->getStatusCode());
     $user = json_decode($client->getResponse()->getContent());
     $this->assertNotEmpty($user);
     $this->assertEquals(2, count((array)$user));
     $this->assertNotEmpty($user->uid);
     $this->assertNotEmpty($user->name);
+
+    $client = $this->createClient($this->httpAuth());
+    $crawler = $client->request('GET', $this->apiPrefix() . 'user/' . $user->uid);
+    $round_trip_user = json_decode($client->getResponse()->getContent());
+    $this->assertEquals($user->uid, $round_trip_user->uid);
+    $this->assertEquals($params['name'], $round_trip_user->name);
+  }
+  
+  public function testPutField() {
+    // Create the user.
+    $params = [
+      'name' => 'put_field',
+      'mail' => 'put_field@example.com',
+    ];
+    $client = $this->createClient($this->httpAuth());
+    $client->request('POST', $this->apiPrefix() . 'user', $params);
+    $api_user = json_decode($client->getResponse()->getContent());
+
+    $user = \user_load($api_user->uid);
+    $this->assertObjectHasAttribute('field_druplex_test', $user);
+    $this->assertNull($user->field_druplex_test['und'][0]['value']);
+    unset($user);
+
+    // Set up the new field params.
+    $field_params = [
+      'fieldname' => 'field_druplex_test',
+      'fieldcolumn' => 'value',
+      'fieldvalue' => 'test_value',
+    ];
+    // Perform the PUT.
+    $client = $this->createClient($this->httpAuth());
+    $client->request('PUT', $this->apiPrefix() . 'user/' . $api_user->uid, $field_params);
+
+    // Verify that it happened.
+    $user = \user_load($api_user->uid);
+    $this->assertEquals($field_params['fieldvalue'], $user->field_druplex_test['und'][0]['value']);
   }
 
 }
