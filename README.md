@@ -31,21 +31,62 @@ The `api_user` and `api_password` settings are used in protecting the Silex path
 
 Note that in order to add Druplex to your Pantheon-hosted site, you'll have to say `composer require mile23/druplex @dev --prefer-dist` since Pantheon (rightly) balks when you try to include git submodules.
 
-What's the API?
+RESTful API
 --
 
-Currently, this API allows you to:
+This API is normalized on JSON.
+
+Currently, you can:
+
 * Query for a user by user ID through GET
-* Update a user through PUT
 * Create a user through POST
+* Update a user through PUT
 * Query for a user by an attached field
 * Generate a one-time login for a user
 
-The paths for this API can be seen in the `Druplex\DruplexApplication` class.
+### `GET /api/user/{uid}`
 
-More documentation forthcoming. Ping me if you need to.
+Gets a sanitized version of the user for the user ID. Included here mostly for completeness and testing.
+
+Returns a resource with `uid` and `name`.
+
+### `POST /api/user`
+
+Post a user resource to the Drupal site.
+
+Requires `name`, `mail`.
+
+If you try to send `pass` it will fail. A random password will be generated for the user. Never send passwords over the internet, OK? :-) See the user one-time login part of this API for a solution to changing the password.
+
+POSTing a user can only add fields which are present in Drupal's user schema. That is, no attached fields.
+
+### `PUT /api/user/{uid}`
+
+Change a user record.
+
+You can change any field which is present in the Drupal user schema, other than `pass` or `name`.
+
+You can change the value of any attached field, too. You must include `fieldname`, `fieldcolumn`, and `fieldvalue`. You can only change one field per PUT, and multivalue fields are unsupported.
+
+### `GET /api/user/{fieldname}/{fieldcolumn}/{fieldvalue}`
+
+Query for a user with a given attached field value.
+
+You must specify the field name, the field column, and the value. The field column is the field's schema column. Fields can have more than one column, so we specify which column. For `text` fields, the column is `value`.
+
+Returns a sanitized user record, as with GET.
+
+### `GET /api/user/uli/{uid}`
+
+Get a one-time login URL for the given user.
+
+Note that 'uli' is the Drush command for returning a one-time login, and that's why the name is used here.
+
+Returns a resource with two properties:
+ * `user` is the sanitized user object.
+ * `uli` is the one-time login URL.
 
 Where are the tests, Mr. Testing Man?
 --
 
-Forthcoming...
+See TESTING.md for all the testing lowdown.
