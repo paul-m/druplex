@@ -14,7 +14,7 @@ function fixture_profile_details() {
  * are met, specifically the modules.
  */
 function fixture_modules_installed($modules) {
-  $instance_name = 'field_druplex_text';
+  $instance_name = 'field_druplex_test';
   field_create_field(array(
     'field_name' => $instance_name,
     'type' => 'text',
