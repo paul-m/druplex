@@ -9,9 +9,8 @@ mysql:
 
 before_script:
  - mysql -e 'create database druplex;'
- - pyrus channel-discover pear.drush.org
- - pyrus install drush/drush
- - phpenv rehash
+ - composer selfupdate
+ - composer global require drush/drush ^7
  - drush make drushmake/fixture.make drupal
  - cp -r drushmake/fixture drupal/profiles
  - cd drupal
