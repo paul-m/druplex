@@ -10,7 +10,8 @@ mysql:
 before_script:
  - mysql -e 'create database druplex;'
  - composer selfupdate
- - composer global require drush/drush ^7
+ - composer global require drush/drush:^7
+ - export PATH="$HOME/.composer/vendor/bin:$PATH"
  - drush make drushmake/fixture.make drupal
  - cp -r drushmake/fixture drupal/profiles
  - cd drupal
