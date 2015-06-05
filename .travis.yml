@@ -8,12 +8,14 @@ mysql:
   encoding: utf8
 
 before_script:
+ - mysql -e 'drop database if exists druplex;'
  - mysql -e 'create database druplex;'
  - composer selfupdate
  - composer global require drush/drush:^7
  - export PATH="$HOME/.composer/vendor/bin:$PATH"
  - drush make drushmake/fixture.make drupal
  - cp -r drushmake/fixture drupal/profiles
+ - cp -r drushmake/druplex_feature drupal/sites/all/modules
  - cd drupal
  - drush si fixture --yes --db-url=mysql://root:@localhost/druplex
  - cd ..

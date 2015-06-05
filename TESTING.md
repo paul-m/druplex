@@ -18,4 +18,3 @@ Then you can finally go back to the root level and run PHPUnit:
 Note that on subsequent test runs, the fixture database may still have the old data from before, causing test failures.
 
 The tests are located in `tests/` and they subclass the Silex/Symfony `WebTestBase` class, and use the `Client` class to mock requests through `Request` injection.
- 

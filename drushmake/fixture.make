@@ -8,3 +8,5 @@ api = 2
 ; Be specific with the version.
 ; Push changes only after testing.
 projects[drupal][version] = 7.37
+
+projects[] = features
