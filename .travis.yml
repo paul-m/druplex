@@ -15,9 +15,8 @@ before_script:
  - drush make drushmake/fixture.make drupal
  - cp -r drushmake/fixture drupal/profiles
  - cd drupal
- - drush si fixture --db-url=mysql://root:@localhost/druplex --yes
+ - drush si fixture --yes --db-url=mysql://root:@localhost/druplex
  - cd ..
- - composer selfupdate
  - composer --no-progress install
 
 script:

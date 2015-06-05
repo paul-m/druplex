@@ -22,8 +22,4 @@ abstract class DruplexTestBase extends WebTestCase {
     return 'api/';
   }
 
-  public function createClient(array $server = array()) {
-    return parent::createClient(array_merge($this->httpAuth(), $server));
-  }
-
 }
