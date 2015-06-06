@@ -74,23 +74,28 @@ class UserBuilder {
     // ?fieldname=field_foo&fieldcolumn=value&fieldvalue=text
     // Gather the fields and schemata.
     // FYI: Field API doesn't have CRUD.
-    $schemata = \drupal_get_schema();
-    $instances = \field_info_instances('user', 'user');
-    foreach (array_keys($instances) as $field) {
-      if ($field == $field_name) {
-        // Which column?
-        $column = $field_name . '_' . $field_column;
-        // Does the column exist in the schemata?
-        if (isset($schemata['field_data_' . $field_name]['fields'][$column])) {
-          // Set the proper language code.
-          $language = \field_language('user', $this->user, $field_name);
-          // Note that we completely ignore the concept of deltas.
-          $this->user->{$field_name}[$language][0][$field_column] = $field_value;
-          $this->changed = TRUE;
-        }
-      }
-    }
+    // We assume that the caller has checked whether the attached field exists.
+    // Get the proper language code.
+    $language = \field_language('user', $this->user, $field_name);
+    // Note that we completely ignore the concept of deltas.
+    $this->user->{$field_name}[$language][0][$field_column] = $field_value;
+    $this->changed = TRUE;
     return $this;
+  }
+  
+  public function attachedFieldExists($field_name, $field_column) {
+    // Get all attached fields for user/user.
+    $instances = \field_info_instances('user', 'user');
+    // Does the field name exist as an attached field?
+    if (isset($instances[$field_name])) {
+      // Get the Drupal schema.
+      $schemata = \drupal_get_schema();
+      // Which column?
+      $column = $field_name . '_' . $field_column;
+      // Does the column exist in the schemata?
+      return isset($schemata['field_data_' . $field_name]['fields'][$column]);
+    }
+    return FALSE;
   }
 
 }

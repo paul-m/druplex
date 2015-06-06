@@ -69,9 +69,11 @@ class UserController {
    *   The UID, gleaned from the request path.
    */
   public function getUser(DruplexApplication $app, $uid) {
-    $user = \user_load($uid);
-    if ($user) {
-      return $app->json(self::sanitize($user));
+    if (is_numeric($uid)) {
+      $user = \user_load($uid);
+      if ($user) {
+        return $app->json(self::sanitize($user));
+      }
     }
     $app->abort(404);
   }
@@ -145,10 +147,17 @@ class UserController {
       // Figure out if we can start changing non-attached fields.
       if ($field_name = $request->get('fieldname', FALSE)) {
         $this->abortForRequiredFields($app, $request, array('fieldcolumn', 'fieldvalue'));
-        // Set the attached field.
-        $user_builder->setAttachedField(
-          $field_name, $request->get('fieldcolumn'), $request->get('fieldvalue')
-        );
+        $field_column = $request->get('fieldcolumn');
+        if ($user_builder->attachedFieldExists($field_name, $field_column)) {
+          // Set the attached field.
+          $user_builder->setAttachedField(
+            $field_name, $field_column, $request->get('fieldvalue')
+          );
+        }
+        else {
+          // Field does not exist. Abort without telling the user why.
+          $app->abort(400);
+        }
       }
       if ($user_builder->changed()) {
         \user_save($user_builder->getUser());
