@@ -53,7 +53,7 @@ class DruplexTest extends DruplexTestBase {
     $this->assertEquals($params['name'], $round_trip_user->name);
   }
   
-  public function testPutField() {
+  public function testPutUserField() {
     // Create the user.
     $params = [
       'name' => 'put_field',
@@ -83,4 +83,44 @@ class DruplexTest extends DruplexTestBase {
     $this->assertEquals($field_params['fieldvalue'], $user->field_druplex_test['und'][0]['value']);
   }
 
+  public function testPutUserFieldBadField() {
+    // Create the user.
+    $params = [
+      'name' => 'put_bad_field',
+      'mail' => 'put_bad_field@example.com',
+    ];
+    $client = $this->createClient($this->httpAuth());
+    $client->request('POST', $this->apiPrefix() . 'user', $params);
+    $api_user = json_decode($client->getResponse()->getContent());
+
+    $user = \user_load($api_user->uid);
+    $this->assertObjectHasAttribute('field_druplex_test', $user);
+    $this->assertNull($user->field_druplex_test['und'][0]['value']);
+    unset($user);
+
+    // Set up the new field params with a bad field name.
+    $field_params = [
+      'fieldname' => 'not_field_druplex_test',
+      'fieldcolumn' => 'value',
+      'fieldvalue' => 'test_value',
+    ];
+    // Perform the PUT.
+    $client = $this->createClient($this->httpAuth());
+    $client->request('PUT', $this->apiPrefix() . 'user/' . $api_user->uid, $field_params);
+    // Verify that we got 400.
+    $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+    // Set up the new field params with a bad column name.
+    $field_params = [
+      'fieldname' => 'field_druplex_test',
+      'fieldcolumn' => 'not_value',
+      'fieldvalue' => 'test_value',
+    ];
+    // Perform the PUT.
+    $client = $this->createClient($this->httpAuth());
+    $client->request('PUT', $this->apiPrefix() . 'user/' . $api_user->uid, $field_params);
+    // Verify that we got 400.
+    $this->assertEquals(400, $client->getResponse()->getStatusCode());
+  }
+  
 }
