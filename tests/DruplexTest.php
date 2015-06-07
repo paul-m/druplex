@@ -7,6 +7,12 @@ use Druplex\DruplexApplication;
 
 class DruplexTest extends DruplexTestBase {
 
+  /**
+   * An array of UIDs to delete from the fixture after the tests are done.
+   * @var array
+   */
+  protected $delete_these_uids = [];
+
   public function testThis() {
     $user = \user_load(1);
     $this->assertEquals(1, $user->uid);
@@ -42,9 +48,10 @@ class DruplexTest extends DruplexTestBase {
     $this->assertEquals(201, $client->getResponse()->getStatusCode());
     $user = json_decode($client->getResponse()->getContent());
     $this->assertNotEmpty($user);
-    $this->assertEquals(2, count((array)$user));
+    $this->assertEquals(2, count((array) $user));
     $this->assertNotEmpty($user->uid);
     $this->assertNotEmpty($user->name);
+    $this->delete_these_uids[] = $user->uid;
 
     $client = $this->createClient($this->httpAuth());
     $crawler = $client->request('GET', $this->apiPrefix() . 'user/' . $user->uid);
@@ -52,7 +59,7 @@ class DruplexTest extends DruplexTestBase {
     $this->assertEquals($user->uid, $round_trip_user->uid);
     $this->assertEquals($params['name'], $round_trip_user->name);
   }
-  
+
   public function testPutUserField() {
     // Create the user.
     $params = [
@@ -62,6 +69,7 @@ class DruplexTest extends DruplexTestBase {
     $client = $this->createClient($this->httpAuth());
     $client->request('POST', $this->apiPrefix() . 'user', $params);
     $api_user = json_decode($client->getResponse()->getContent());
+    $this->delete_these_uids[] = $api_user->uid;
 
     $user = \user_load($api_user->uid);
     $this->assertObjectHasAttribute('field_druplex_test', $user);
@@ -92,6 +100,7 @@ class DruplexTest extends DruplexTestBase {
     $client = $this->createClient($this->httpAuth());
     $client->request('POST', $this->apiPrefix() . 'user', $params);
     $api_user = json_decode($client->getResponse()->getContent());
+    $this->delete_these_uids[] = $api_user->uid;
 
     $user = \user_load($api_user->uid);
     $this->assertObjectHasAttribute('field_druplex_test', $user);
@@ -122,5 +131,14 @@ class DruplexTest extends DruplexTestBase {
     // Verify that we got 400.
     $this->assertEquals(400, $client->getResponse()->getStatusCode());
   }
-  
+
+  public function tearDown() {
+    // Remove fixture users we generated during the test.
+    if (count($this->delete_these_uids)) {
+      \user_delete_multiple($this->delete_these_uids);
+      $this->delete_these_uids = [];
+    }
+    parent::tearDown();
+  }
+
 }
