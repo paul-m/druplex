@@ -17,6 +17,7 @@ before_script:
  - cp -r drushmake/fixture drupal/profiles
  - cp -r drushmake/druplex_feature drupal/sites/all/modules
  - cd drupal
+ - php -i | grep sendmail
  - drush si fixture --yes --db-url=mysql://root:@localhost/druplex
  - cd ..
  - composer --no-progress install
