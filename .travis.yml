@@ -18,7 +18,7 @@ before_script:
  - cp -r drushmake/druplex_feature drupal/sites/all/modules
  - cd drupal
  - php -i | grep sendmail
- - drush si fixture --yes --db-url=mysql://root:@localhost/druplex
+ - env PHP_OPTIONS="-d sendmail_path=`which true`" drush site-install fixture --yes --db-url=mysql://root:@localhost/druplex
  - cd ..
  - composer --no-progress install
 
