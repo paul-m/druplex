@@ -47,7 +47,10 @@ class DruplexApplication extends Application {
 
     // Honor Drupal's maintenance_mode.
     $this->before(function (Request $request, Application $this) {
-      $maintenance = \variable_get('maintenance_mode', TRUE);
+      // Unless your site profile sets maintenance mode explicitly, it will not
+      // exist. So even though it would be better to default to TRUE here, we
+      // have to default to FALSE.
+      $maintenance = \variable_get('maintenance_mode', FALSE);
       if ($maintenance) {
         $this->abort(503, 'Site under maintenance.');
       }
