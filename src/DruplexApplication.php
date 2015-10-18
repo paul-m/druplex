@@ -45,6 +45,14 @@ class DruplexApplication extends Application {
 
     $this['debug'] = TRUE;
 
+    // Honor Drupal's maintenance_mode.
+    $this->before(function (Request $request, Application $this) {
+      $maintenance = \variable_get('maintenance_mode', TRUE);
+      if ($maintenance) {
+        $this->abort(503, 'Site under maintenance.');
+      }
+    });
+
     // Set up JSON as a middleware.
     $this->before(function (Request $request, Application $this) {
       if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {

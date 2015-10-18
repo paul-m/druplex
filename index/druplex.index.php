@@ -28,11 +28,7 @@ $path_array = explode('/', $request->getPathInfo());
 
 // If we match a route from Druplex, use Druplex.
 $druplex_path = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : 'api';
-if (
-  isset($path_array[1]) &&
-  $path_array[1] == $druplex_path &&
-  (!variable_get('maintenance_mode', TRUE))
-  ) {
+if (isset($path_array[1]) && $path_array[1] == $druplex_path) {
   // Make a Druplex app object.
   $app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
   $app->run($request);
