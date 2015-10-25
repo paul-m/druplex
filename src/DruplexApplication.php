@@ -43,8 +43,6 @@ class DruplexApplication extends Application {
     $this['debug'] = isset($druplex['debug']) ? $druplex['debug'] : FALSE;
     $this['api_prefix'] = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : '/api';
 
-    $this['debug'] = TRUE;
-
     // Set up JSON as a middleware.
     $this->before(function (Request $request, Application $this) {
       if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {

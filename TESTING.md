@@ -7,7 +7,7 @@ Basically, if you want to test this thing locally you must set up a Drupal 7 sit
 
 	$ drush make drushmake/fixture.make drupal
 	$ cp -r drushmake/fixture drupal/profiles
-	$ cp -r drushmake/drush_feature drupal/sites/all/modules
+	$ cp -r drushmake/druplex_feature drupal/sites/all/modules
 	$ cd drupal
 	$ drush si fixture --db-url=.....
 
