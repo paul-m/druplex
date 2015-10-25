@@ -43,6 +43,17 @@ class DruplexApplication extends Application {
     $this['debug'] = isset($druplex['debug']) ? $druplex['debug'] : FALSE;
     $this['api_prefix'] = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : '/api';
 
+    // Honor Drupal's maintenance_mode.
+    $this->before(function (Request $request, Application $app) {
+      // Unless your site profile sets maintenance mode explicitly, it will not
+      // exist. So even though it would be better to default to TRUE here, we
+      // have to default to FALSE.
+      $maintenance = \variable_get('maintenance_mode', FALSE);
+      if ($maintenance) {
+        $app->abort(503, 'Site under maintenance.');
+      }
+    }, Application::EARLY_EVENT);
+
     // Set up JSON as a middleware.
     $this->before(function (Request $request, Application $this) {
       if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
