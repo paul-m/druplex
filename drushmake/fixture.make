@@ -7,6 +7,6 @@ api = 2
 
 ; Be specific with the version.
 ; Push changes only after testing.
-projects[drupal][version] = 7.39
+projects[drupal][version] = 7.42
 
 projects[] = features
