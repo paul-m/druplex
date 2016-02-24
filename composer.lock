@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "25470b51f243d38cf7443d9e24b728df",
-    "content-hash": "017a43ff3ca86476535cb29eb291c231",
+    "hash": "94a3811cfd18a68608970eeefbfc15d1",
+    "content-hash": "6488b17f36b9991e908abf0355fe5b23",
     "packages": [
         {
             "name": "ircmaxell/password-compat",
@@ -2141,7 +2141,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "5.5.*"
+        "php": "^5.5"
     },
     "platform-dev": []
 }
