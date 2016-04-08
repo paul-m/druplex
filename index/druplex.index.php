@@ -9,6 +9,7 @@
 
 use Druplex\DruplexApplication;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 
 /**
  * Root directory of Drupal installation.
@@ -24,11 +25,12 @@ drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
 // Get request path.
 $request = Request::createFromGlobals();
-$path_array = explode('/', $request->getPathInfo());
 
 // If we match a route from Druplex, use Druplex.
 $druplex_path = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : 'api';
-if (isset($path_array[1]) && $path_array[1] == $druplex_path) {
+
+$matcher = new RequestMatcher('^/' . $druplex_path . '/');
+if ($matcher->matches($request)) {
   // Make a Druplex app object.
   $app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
   $app->run($request);
@@ -37,7 +39,6 @@ if (isset($path_array[1]) && $path_array[1] == $druplex_path) {
 else {
   unset($druplex);
   unset($druplex_path);
-  unset($path_array);
   unset($request);
   menu_execute_active_handler();
 }
