@@ -12,6 +12,7 @@ use Silex\Application;
 use Silex\Provider\SecurityServiceProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
@@ -23,6 +24,24 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
  * configuration.
  */
 class DruplexApplication extends Application {
+
+  /**
+   * Create an app object for handing the given prefix.
+   *
+   * @param Request $request
+   *   The request we are handling.
+   * @param string $prefix
+   *   The prefix this Druplex should handle.
+   *
+   * @return self|null
+   *   A nice app object, or NULL if the prefix does not match.
+   */
+  public static function createAppForPrefix(Request $request, $prefix) {
+    $matcher = new RequestMatcher('^\/' . $prefix . '\/\S*');
+    if ($matcher->matches($request)) {
+      return new static(array());
+    }
+  }
 
   /**
    * Constructor.

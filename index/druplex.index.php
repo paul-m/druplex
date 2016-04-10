@@ -29,10 +29,9 @@ $request = Request::createFromGlobals();
 // If we match a route from Druplex, use Druplex.
 $druplex_path = isset($druplex['api_prefix']) ? $druplex['api_prefix'] : 'api';
 
-$matcher = new RequestMatcher('^/' . $druplex_path . '/');
-if ($matcher->matches($request)) {
-  // Make a Druplex app object.
-  $app = new DruplexApplication(array('drupal_root' => DRUPAL_ROOT));
+// Make a Druplex app object.
+$app = DruplexApplication::createAppForPrefix($request, $druplex_path);
+if ($app) {
   $app->run($request);
 }
 // Otherwise, use Drupal.
